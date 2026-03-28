@@ -4,7 +4,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 ARG PUID=2000
 ARG PGID=2000
-ARG MM_VERSION=11.5.0
+ARG MM_VERSION=11.5.1
 ARG MM_PACKAGE="https://releases.mattermost.com/${MM_VERSION}/mattermost-${MM_VERSION}-linux-arm64.tar.gz"
 
 RUN apt-get update && \
