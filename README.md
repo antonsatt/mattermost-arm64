@@ -7,13 +7,13 @@ Uses official Mattermost ARM64 binaries from [releases.mattermost.com](https://r
 ## Usage
 
 ```bash
-docker pull ghcr.io/<your-github-username>/mattermost-arm64:latest
+docker pull ghcr.io/antonsatt/mattermost-arm64:latest
 ```
 
 Or a specific version:
 
 ```bash
-docker pull ghcr.io/<your-github-username>/mattermost-arm64:11.5.0
+docker pull ghcr.io/antonsatt/mattermost-arm64:11.5.0
 ```
 
 ## How it works
@@ -36,5 +36,5 @@ docker build --build-arg MM_VERSION=11.5.0 -t mattermost-arm64:11.5.0 .
 ## Kubernetes
 
 ```yaml
-image: ghcr.io/<your-github-username>/mattermost-arm64:11.5.0
+image: ghcr.io/antonsatt/mattermost-arm64:11.5.0
 ```
