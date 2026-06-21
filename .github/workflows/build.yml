@@ -83,3 +83,30 @@ jobs:
           echo "- **Version:** $VERSION" >> "$GITHUB_STEP_SUMMARY"
           echo "- **Image:** \`$IMAGE:$VERSION\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- **Platform:** linux/arm64" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Bump tag in infra repo (deploy)
+        if: steps.check.outputs.exists == 'false'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          INFRA_REPO_TOKEN: ${{ secrets.INFRA_REPO_TOKEN }}
+        run: |
+          git clone --depth 1 \
+            "https://x-access-token:${INFRA_REPO_TOKEN}@github.com/AntonSatt/sort-my-infra.git" infra
+          cd infra
+          FILE=kubernetes/apps/mattermost/deployment.yml
+          OLD=$(grep -oE 'mattermost-arm64:[0-9]+\.[0-9]+\.[0-9]+' "$FILE" | head -1 | cut -d: -f2)
+          # Safety: never auto-deploy a major bump (potentially breaking DB migrations) — do those by hand.
+          if [ "${VERSION%%.*}" != "${OLD%%.*}" ]; then
+            echo "Major version change ${OLD} -> ${VERSION}; skipping auto-bump (run manually)."
+            exit 0
+          fi
+          sed -i -E "s#(ghcr.io/antonsatt/mattermost-arm64:).*#\1${VERSION}#" "$FILE"
+          if git diff --quiet; then
+            echo "Manifest already at ${VERSION}; nothing to commit."
+            exit 0
+          fi
+          git config user.name  "mattermost-arm64-bot"
+          git config user.email "bot@antonsatt.com"
+          git commit -am "chore(mattermost): bump to ${VERSION}"
+          git push
+          echo "- **Deployed:** bumped infra manifest ${OLD} -> ${VERSION}" >> "$GITHUB_STEP_SUMMARY"
